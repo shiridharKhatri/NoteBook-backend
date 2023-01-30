@@ -11,7 +11,10 @@ const storage = multer.diskStorage({
     cb(null, `${Date.now()}${file.originalname}`);
   },
 });
-const update = multer({ storage: storage }).single("avatar");
+const update = multer({
+  storage: storage,
+  limits: { fileSize: "50mb" },
+}).single("avatar");
 router.post("/avatar", fetchusers, update, async (req, res) => {
   try {
     const photo = await Avatar.create({
@@ -23,7 +26,7 @@ router.post("/avatar", fetchusers, update, async (req, res) => {
   } catch (error) {
     return res
       .status(400)
-      .json({ msg: "Some error occur in the server", error: error.message });
+      .json({ msg: "Some error occur ", error: error.message });
   }
 });
 router.get("/fetchAvatar", fetchusers, async (req, res) => {
@@ -48,8 +51,10 @@ router.delete("/deleteAvatar/:id", fetchusers, async (req, res) => {
         msg: "Not Allowed! You dont have access to delete this image",
       });
     }
-    avatar = await Avatar.findByIdAndDelete(req.params.id)
-    res.status(200).json({ success: true, msg: "Success! Photo deleted successfully" });
+    avatar = await Avatar.findByIdAndDelete(req.params.id);
+    res
+      .status(200)
+      .json({ success: true, msg: "Success! Photo deleted successfully" });
   } catch (error) {
     return res.status(400).json({ success: false, msg: "Some Error occured" });
   }
